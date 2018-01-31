@@ -1,0 +1,23 @@
+{
+  "name": "cloudify-uptime",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "description": "Cloudify Uptime endpoint",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "gcloud beta functions deploy cloudifyUptime --entry-point cloudifyUptime --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cloudify-cosmo/cloudify-usage.git"
+  },
+  "dependencies": {
+    "request": "^2.83.0",
+    "bluebird": "^3.5.1",
+    "http-status-codes": "^1.3.0",
+    "@google-cloud/bigquery": "^1.0.0"
+  },
+  "homepage": "https://github.com/cloudify-cosmo/cloudify-usage#readme",
+  "devDependencies": {},
+  "author": "Cloudify"
+}

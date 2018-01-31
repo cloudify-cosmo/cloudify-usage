@@ -1,0 +1,9 @@
+[
+  {"name": "manager_id", "type": "STRING", "mode": "NULLABLE", "description": ""},
+  {"name": "version", "type": "STRING", "mode": "NULLABLE", "description": ""},
+  {"name": "premium_edition", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
+  {"name": "manager_public_ip", "type": "STRING", "mode": "NULLABLE", "description": ""},
+  {"name": "geoip_info", "type": "STRING", "mode": "NULLABLE", "description": ""},
+  {"name": "creation_ts_sec", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "latest_ack_ts_sec", "type": "INTEGER", "mode": "NULLABLE", "description": ""}
+]
