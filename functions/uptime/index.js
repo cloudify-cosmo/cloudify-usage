@@ -136,7 +136,10 @@ function _geoIP(ip_addr) {
 
 exports.cloudifyUptime = function cloudifyUptime (req, res) {
     var body = req.body;
-    var user_ip = req.headers['x-forwarded-for'];
+    var user_ip = req.headers['x-real-ip'];
+    if (cloudifyIPs.indexOf(user_ip) >= 0) {
+        console.log('>>> This request comes from Cloudify ip <<<');
+    }
     if (!body.hasOwnProperty('data')) {
         res.status(400).send('Bad Input');
         return;
@@ -146,9 +149,6 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
     console.log("Headers: " + JSON.stringify(req.headers));
     console.log("Body: " + JSON.stringify(body));
     console.log("Data: " + JSON.stringify(data));
-    if (cloudifyIPs.indexOf(user_ip) >= 0) {
-        console.log('>>> This request comes from Cloudify ip <<<');
-    }
 
     var manager_id = data['metadata']['manager_id'];
     var condition = `manager_id = '${manager_id}'`;
