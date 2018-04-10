@@ -65,7 +65,7 @@ function _getValue(data, key) {
 
 exports.cloudifyUsage = function cloudifyUptime (req, res) {
     var body = req.body;
-    var user_ip = req.headers['x-forwarded-for'];
+    var user_ip = req.headers['x-real-ip'];
     var data = JSON.parse(body['data']);
     var timestamp_sec = Math.round(new Date().getTime() / 1000);
 
