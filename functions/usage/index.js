@@ -1,7 +1,8 @@
 
-var Promise = require("bluebird");
+//var Promise = require("bluebird");
 var BigQuery = require('@google-cloud/bigquery');
 var bigQuery = BigQuery({ projectId: 'omer-tenant' });
+var geoip2 = require('geoip2');
 
 const cloudifyIPs = ["31.168.96.38", "54.77.157.208"];
 
@@ -35,14 +36,6 @@ function insertData(row) {
     });
 }
 
-
-function _geoIP(ip_addr) {
-    if (cloudifyIPs.indexOf(ip_addr) >= 0) {
-        return JSON.stringify({organization: 'cloudify'});
-    }
-    return '';
-}
-
 function _getValue(data, key) {
     let value = key in data ? data[key] : '';
     // empty value
@@ -63,7 +56,48 @@ function _getValue(data, key) {
     return value;
 }
 
-exports.cloudifyUsage = function cloudifyUptime (req, res) {
+function getGeoLocationInfo(userIP) {
+    return new Promise(function (resolve, reject) {
+        try {
+            geoip2.init('geo/GeoLite2-City.mmdb');
+            geoip2.lookup(userIP, function(error, result) {
+              if (error) {
+                console.log("GEOIP Error: %s", error);
+                resolve({});
+              } else if (result) {
+                console.log("GEOIP result: " + JSON.stringify(result));
+                result = getGeoIpInfo(result)
+                console.log("GEOIP slim result: " + JSON.stringify(result));
+                resolve(result);
+              } else {
+                reject(Error("say what??"));
+              }
+            });
+        }
+        catch(err) {
+            console.log(`failed to retrieve geo ip info: ${err.message}`);
+            resolve({});
+        }
+    });
+}
+
+function getGeoIpInfo(geoIpInfo) {
+    console.log("GEOIP: " + JSON.stringify(geoIpInfo));
+    var country = geoIpInfo['country']['names']['en'];
+    var city = geoIpInfo['city']['names']['en'];
+    var continent = geoIpInfo['continent']['names']['en']
+    var subdivision = geoIpInfo['subdivisions'][0]['names']['en']
+    var timezone = geoIpInfo['location']['time_zone']
+    if (subdivision != city) {
+        var location = `${city}, ${subdivision}, ${country}`
+    } else {
+        var location = `${city}, ${country}`
+    }
+    return {country: country, city: city, location: location, subdivision: subdivision,
+            continent: continent, timezone: timezone}
+}
+
+exports.cloudifyUsage = function cloudifyUsage (req, res) {
     var body = req.body;
     var user_ip = req.headers['x-real-ip'];
     var data = JSON.parse(body['data']);
@@ -83,42 +117,47 @@ exports.cloudifyUsage = function cloudifyUptime (req, res) {
             let key = `${title}_${bullet}`;
             let value = data[title][bullet];
             row_data[key] = value;
-            console.log("Adding Data: " + JSON.stringify(data));
-            console.log(`Adding ${key}: ${row_data[key]}`)
         }
     }
     console.log("row_data: " + JSON.stringify(row_data));
 
-    var row = {
-        'metadata_manager_id': _getValue(row_data, 'metadata_manager_id'),
-        'system_cpu_count': _getValue(row_data, 'system_cpu_count'),
-        'system_redhat_os': _getValue(row_data, 'system_redhat_os'),
-        'system_mem_size_gb': _getValue(row_data, 'system_mem_size_gb'),
-        'system_centos_os': _getValue(row_data, 'system_centos_os'),
-        'cloudify_usage_tenants_count': _getValue(row_data, 'cloudify_usage_tenants_count'),
-        'cloudify_usage_users_count': _getValue(row_data, 'cloudify_usage_users_count'),
-        'cloudify_usage_azure_plugin': _getValue(row_data, 'cloudify_usage_azure_plugin'),
-        'cloudify_usage_aws_plugin': _getValue(row_data, 'cloudify_usage_aws_plugin'),
-        'cloudify_usage_gcp_plugin': _getValue(row_data, 'cloudify_usage_gcp_plugin'),
-        'cloudify_usage_executions_count': _getValue(row_data, 'cloudify_usage_executions_count'),
-        'cloudify_usage_nodes_count': _getValue(row_data, 'cloudify_usage_nodes_count'),
-        'cloudify_usage_node_instances_count': _getValue(row_data, 'cloudify_usage_node_instances_count'),
-        'cloudify_usage_deployments_count': _getValue(row_data, 'cloudify_usage_deployments_count'),
-        'cloudify_usage_secrets_count': _getValue(row_data, 'cloudify_usage_secrets_count'),
-        'cloudify_usage_plugins_count': _getValue(row_data, 'cloudify_usage_plugins_count'),
-        'cloudify_usage_openstack_plugin': _getValue(row_data, 'cloudify_usage_openstack_plugin'),
-        'cloudify_usage_blueprints_count': _getValue(row_data, 'cloudify_usage_blueprints_count'),
-        'cloudify_config_ha_enabled': _getValue(row_data, 'cloudify_config_ha_enabled'),
-        'metadata_version': _getValue(row_data, 'metadata_version'),
-        'metadata_premium_edition': _getValue(row_data, 'metadata_premium_edition'),
-        'cloudify_config_ldap_enabled': _getValue(row_data, 'cloudify_config_ldap_enabled'),
-        'metadata_manager_public_ip': user_ip,
-        'metadata_geoip_info': _geoIP(user_ip),
-        'metadata_timestamp': timestamp_sec
-    };
+    getGeoLocationInfo(user_ip).then(geoIpInfo => {
+        console.log('got the geolocation info! ')
+        var locationInfo = geoIpInfo;
+        console.log('locationInfo: ' + JSON.stringify(locationInfo))
 
-    console.log('Creating new record');
-    insertData(row)
+        var row = {
+            'metadata_manager_id': _getValue(row_data, 'metadata_manager_id'),
+            'system_cpu_count': _getValue(row_data, 'system_cpu_count'),
+            'system_redhat_os': _getValue(row_data, 'system_redhat_os'),
+            'system_mem_size_gb': _getValue(row_data, 'system_mem_size_gb'),
+            'system_centos_os': _getValue(row_data, 'system_centos_os'),
+            'cloudify_usage_tenants_count': _getValue(row_data, 'cloudify_usage_tenants_count'),
+            'cloudify_usage_users_count': _getValue(row_data, 'cloudify_usage_users_count'),
+            'cloudify_usage_azure_plugin': _getValue(row_data, 'cloudify_usage_azure_plugin'),
+            'cloudify_usage_aws_plugin': _getValue(row_data, 'cloudify_usage_aws_plugin'),
+            'cloudify_usage_gcp_plugin': _getValue(row_data, 'cloudify_usage_gcp_plugin'),
+            'cloudify_usage_executions_count': _getValue(row_data, 'cloudify_usage_executions_count'),
+            'cloudify_usage_nodes_count': _getValue(row_data, 'cloudify_usage_nodes_count'),
+            'cloudify_usage_node_instances_count': _getValue(row_data, 'cloudify_usage_node_instances_count'),
+            'cloudify_usage_deployments_count': _getValue(row_data, 'cloudify_usage_deployments_count'),
+            'cloudify_usage_secrets_count': _getValue(row_data, 'cloudify_usage_secrets_count'),
+            'cloudify_usage_plugins_count': _getValue(row_data, 'cloudify_usage_plugins_count'),
+            'cloudify_usage_openstack_plugin': _getValue(row_data, 'cloudify_usage_openstack_plugin'),
+            'cloudify_usage_blueprints_count': _getValue(row_data, 'cloudify_usage_blueprints_count'),
+            'cloudify_config_ha_enabled': _getValue(row_data, 'cloudify_config_ha_enabled'),
+            'metadata_version': _getValue(row_data, 'metadata_version'),
+            'metadata_premium_edition': _getValue(row_data, 'metadata_premium_edition'),
+            'cloudify_config_ldap_enabled': _getValue(row_data, 'cloudify_config_ldap_enabled'),
+            'metadata_manager_public_ip': user_ip,
+            'metadata_geoip_info': locationInfo.location,
+            'metadata_geoip_country': locationInfo.country,
+            'metadata_geoip_city': locationInfo.city,
+            'metadata_timestamp': timestamp_sec
+        };
+
+        console.log('Creating new record');
+        insertData(row)
         .then(results => {
             console.log('New record created');
             res.status(200).send(results);
@@ -128,4 +167,5 @@ exports.cloudifyUsage = function cloudifyUptime (req, res) {
             var result = JSON.stringify({'error': err});
             res.status(400).send(result);
           });
+    });
 };

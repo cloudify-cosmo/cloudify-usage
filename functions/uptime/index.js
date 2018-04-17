@@ -1,7 +1,8 @@
 
-var Promise = require("bluebird");
+//var Promise = require("bluebird");
 var BigQuery = require('@google-cloud/bigquery');
 var bigQuery = BigQuery({ projectId: 'omer-tenant' });
+var geoip2 = require('geoip2');
 
 const cloudifyIPs = ["31.168.96.38", "54.77.157.208"];
 
@@ -126,17 +127,53 @@ function deleteData() {
 }
 
 
-function _geoIP(ip_addr) {
-    if (cloudifyIPs.indexOf(ip_addr) >= 0) {
-        return JSON.stringify({organization: 'cloudify'});
+function getGeoLocationInfo(userIP) {
+    return new Promise(function (resolve, reject) {
+        try {
+            geoip2.init('geo/GeoLite2-City.mmdb');
+            geoip2.lookup(userIP, function(error, result) {
+              if (error) {
+                console.log("GEOIP Error: %s", error);
+                resolve({});
+              } else if (result) {
+                console.log("GEOIP result: " + JSON.stringify(result));
+                result = getGeoIpInfo(result)
+                console.log("GEOIP slim result: " + JSON.stringify(result));
+                resolve(result);
+              } else {
+                reject(Error("say what??"));
+              }
+            });
+        }
+        catch(err) {
+            console.log(`failed to retrieve geo ip info: ${err.message}`);
+            resolve({});
+        }
+    });
+}
+
+function getGeoIpInfo(geoIpInfo) {
+    console.log("GEOIP: " + JSON.stringify(geoIpInfo));
+    var country = geoIpInfo['country']['names']['en'];
+    var city = geoIpInfo['city']['names']['en'];
+    var continent = geoIpInfo['continent']['names']['en']
+    var subdivision = geoIpInfo['subdivisions'][0]['names']['en']
+    var timezone = geoIpInfo['location']['time_zone']
+    if (subdivision != city) {
+        var location = `${city}, ${subdivision}, ${country}`
+    } else {
+        var location = `${city}, ${country}`
     }
-    return '';
+    return {country: country, city: city, location: location, subdivision: subdivision,
+            continent: continent, timezone: timezone}
 }
 
 
 exports.cloudifyUptime = function cloudifyUptime (req, res) {
     var body = req.body;
     var user_ip = req.headers['x-real-ip'];
+    var geoIpInfo = '';
+
     if (cloudifyIPs.indexOf(user_ip) >= 0) {
         console.log('>>> This request comes from Cloudify ip <<<');
     }
@@ -153,7 +190,14 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
     var manager_id = data['metadata']['manager_id'];
     var condition = `manager_id = '${manager_id}'`;
     console.log('Going to read Data, condition: ' + condition);
-    readData(condition).then(function(results_rows) {
+
+    Promise.all([getGeoLocationInfo(user_ip), readData(condition)])
+    .then(function(values) {
+        var locationInfo = values[0];
+        var results_rows = values[1];
+
+        console.log("GEOIP info: " + JSON.stringify(locationInfo));
+
         if (results_rows.length > 0) {
             console.log('Updating existing record: ' + condition);
             printResults(results_rows);
@@ -175,9 +219,12 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
                 'version': data['metadata']['version'],
                 'premium_edition': data['metadata']['premium_edition'],
                 'manager_public_ip': user_ip,
-                'geoip_info': _geoIP(user_ip),
+                'geoip_info': location,
                 'creation_ts_sec': timestamp_sec,
-                'latest_ack_ts_sec': timestamp_sec
+                'latest_ack_ts_sec': timestamp_sec,
+                'metadata_geoip_info': locationInfo.location,
+                'metadata_geoip_country': locationInfo.country,
+                'metadata_geoip_city': locationInfo.city,
             };
 
             insertData(row).then(results => {
