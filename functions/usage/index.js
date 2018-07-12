@@ -1,5 +1,6 @@
 
 //var Promise = require("bluebird");
+const request = require('request');
 var BigQuery = require('@google-cloud/bigquery');
 var bigQuery = BigQuery({ projectId: 'omer-tenant' });
 var geoip2 = require('geoip2');
@@ -47,8 +48,8 @@ function _getValue(data, key) {
     if (isBoolean) {
         return Boolean(value).valueOf();
     }
-    // numeric value
-    let isNumeric = !isNaN(value)
+    // numeric integer value (not float, since version 4.4 should be a string
+    let isNumeric = !isNaN(value) && String(value).indexOf(".") == -1
     if (isNumeric) {
         return parseInt(value)
     }
@@ -56,7 +57,7 @@ function _getValue(data, key) {
     return value;
 }
 
-function getGeoLocationInfo(userIP) {
+function getGeoLocationInfo(org, userIP) {
     return new Promise(function (resolve, reject) {
         try {
             geoip2.init('geo/GeoLite2-City.mmdb');
@@ -67,6 +68,7 @@ function getGeoLocationInfo(userIP) {
               } else if (result) {
                 console.log("GEOIP result: " + JSON.stringify(result));
                 result = getGeoIpInfo(result)
+                result['org'] = org;
                 console.log("GEOIP slim result: " + JSON.stringify(result));
                 resolve(result);
               } else {
@@ -97,6 +99,35 @@ function getGeoIpInfo(geoIpInfo) {
             continent: continent, timezone: timezone}
 }
 
+function ipToOrg(ip_addr) {
+    return new Promise(function (resolve, reject) {
+        try {
+            console.log(`request org for ip: ${ip_addr}`)
+            var headers = {'Accept': 'application/json'};
+            var options = {
+                url: `https://us-central1-omer-tenant.cloudfunctions.net/orginfo?ip_addr=${ip_addr}`,
+                method: 'GET',
+                json: true,
+            };
+            request(options, (err, response, body) => {
+                try {
+                    console.log('result: ' + JSON.stringify(body))
+                    console.log('response: ' + JSON.stringify(response))
+                    console.log('err: ' + err)
+                    resolve(body['organization']);
+                } catch (e) {
+                    console.log('exception: ' + e)
+                    resolve('');
+                }
+            })
+        }
+        catch(err) {
+            console.log(`failed to retrieve organization info: ${err.message}`);
+            resolve('');
+        }
+    });
+}
+
 exports.cloudifyUsage = function cloudifyUsage (req, res) {
     var body = req.body;
     var user_ip = req.headers['x-real-ip'];
@@ -121,7 +152,9 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
     }
     console.log("row_data: " + JSON.stringify(row_data));
 
-    getGeoLocationInfo(user_ip).then(geoIpInfo => {
+    ipToOrg(user_ip)
+    .then(organization => getGeoLocationInfo(organization, user_ip))
+    .then(geoIpInfo => {
         console.log('got the geolocation info! ')
         var locationInfo = geoIpInfo;
         console.log('locationInfo: ' + JSON.stringify(locationInfo))
@@ -132,6 +165,7 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
             'system_redhat_os': _getValue(row_data, 'system_redhat_os'),
             'system_mem_size_gb': _getValue(row_data, 'system_mem_size_gb'),
             'system_centos_os': _getValue(row_data, 'system_centos_os'),
+            'cloudify_image_info': _getValue(row_data, 'metadata_image_info'),
             'cloudify_usage_tenants_count': _getValue(row_data, 'cloudify_usage_tenants_count'),
             'cloudify_usage_users_count': _getValue(row_data, 'cloudify_usage_users_count'),
             'cloudify_usage_azure_plugin': _getValue(row_data, 'cloudify_usage_azure_plugin'),
@@ -153,6 +187,7 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
             'metadata_geoip_info': locationInfo.location,
             'metadata_geoip_country': locationInfo.country,
             'metadata_geoip_city': locationInfo.city,
+            'metadata_geoip_org': locationInfo.org,
             'metadata_timestamp': timestamp_sec
         };
 

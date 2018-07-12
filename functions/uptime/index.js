@@ -1,5 +1,6 @@
 
 //var Promise = require("bluebird");
+const request = require('request');
 var BigQuery = require('@google-cloud/bigquery');
 var bigQuery = BigQuery({ projectId: 'omer-tenant' });
 var geoip2 = require('geoip2');
@@ -68,13 +69,13 @@ function insertData(row) {
 }
 
 
-function updateData(condition) {
+function updateData(condition, locationInfo) {
     return new Promise(function (resolve, reject) {
         var timestamp_sec = Math.round(new Date().getTime() / 1000);
 
         // create read data query
         const sqlQuery = `UPDATE cloudify_usage.managers_uptime
-            SET latest_ack_ts_sec = ${timestamp_sec}
+            SET latest_ack_ts_sec = ${timestamp_sec}, metadata_geoip_city = "${locationInfo.city}", metadata_geoip_country = "${locationInfo.country}", metadata_geoip_info = "${locationInfo.location}", metadata_geoip_org = "${locationInfo.org}"
             WHERE ${condition};`;
 
         console.log(`Running: ${sqlQuery}`);
@@ -89,11 +90,11 @@ function updateData(condition) {
           .query(options)
           .then(results => {
             const rows = results[0];
-            console.log('Got Query Results');
+            console.log('Updated record uptime data.');
             resolve(rows);
           })
           .catch(err => {
-            console.error('ERROR:', err);
+            console.error(`ERROR. Failed to update with ${condition}:`, err);
             reject(Error("It broke"));
           });
     });
@@ -154,11 +155,11 @@ function getGeoLocationInfo(userIP) {
 
 function getGeoIpInfo(geoIpInfo) {
     console.log("GEOIP: " + JSON.stringify(geoIpInfo));
-    var country = geoIpInfo['country']['names']['en'];
-    var city = geoIpInfo['city']['names']['en'];
-    var continent = geoIpInfo['continent']['names']['en']
-    var subdivision = geoIpInfo['subdivisions'][0]['names']['en']
-    var timezone = geoIpInfo['location']['time_zone']
+    var country = 'country' in geoIpInfo ? geoIpInfo['country']['names']['en'] : '';
+    var city = 'city' in geoIpInfo ? geoIpInfo['city']['names']['en'] : '';
+    var continent = 'city' in geoIpInfo ? geoIpInfo['continent']['names']['en'] : '';
+    var subdivision = 'subdivisions' in geoIpInfo ? geoIpInfo['subdivisions'][0]['names']['en'] : '';
+    var timezone = 'location' in geoIpInfo ? geoIpInfo['location']['time_zone'] : '';
     if (subdivision != city) {
         var location = `${city}, ${subdivision}, ${country}`
     } else {
@@ -166,6 +167,36 @@ function getGeoIpInfo(geoIpInfo) {
     }
     return {country: country, city: city, location: location, subdivision: subdivision,
             continent: continent, timezone: timezone}
+}
+
+
+function ipToOrg(ip_addr) {
+    return new Promise(function (resolve, reject) {
+        try {
+            console.log(`request org for ip: ${ip_addr}`)
+            var headers = {'Accept': 'application/json'};
+            var options = {
+                url: `https://us-central1-omer-tenant.cloudfunctions.net/orginfo?ip_addr=${ip_addr}`,
+                method: 'GET',
+                json: true,
+            };
+            request(options, (err, response, body) => {
+                try {
+                    console.log('result: ' + JSON.stringify(body))
+                    console.log('response: ' + JSON.stringify(response))
+                    console.log('err: ' + err)
+                    resolve(body['organization']);
+                } catch (e) {
+                    console.log('exception: ' + e)
+                    resolve('');
+                }
+            })
+        }
+        catch(err) {
+            console.log(`failed to retrieve organization info: ${err.message}`);
+            resolve('');
+        }
+    });
 }
 
 
@@ -191,10 +222,12 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
     var condition = `manager_id = '${manager_id}'`;
     console.log('Going to read Data, condition: ' + condition);
 
-    Promise.all([getGeoLocationInfo(user_ip), readData(condition)])
+    Promise.all([getGeoLocationInfo(user_ip), ipToOrg(user_ip), readData(condition)])
     .then(function(values) {
         var locationInfo = values[0];
-        var results_rows = values[1];
+        var org = values[1];
+        var results_rows = values[2];
+        locationInfo['org'] = org;
 
         console.log("GEOIP info: " + JSON.stringify(locationInfo));
 
@@ -202,7 +235,7 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
             console.log('Updating existing record: ' + condition);
             printResults(results_rows);
 
-            updateData(condition).then(results => {
+            updateData(condition, locationInfo).then(results => {
                 var result = JSON.stringify({'result': ''});
                 res.status(200).send(result);
             }).catch(err => {
@@ -219,12 +252,13 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
                 'version': data['metadata']['version'],
                 'premium_edition': data['metadata']['premium_edition'],
                 'manager_public_ip': user_ip,
-                'geoip_info': location,
+                'geoip_info': locationInfo.location,
                 'creation_ts_sec': timestamp_sec,
                 'latest_ack_ts_sec': timestamp_sec,
                 'metadata_geoip_info': locationInfo.location,
                 'metadata_geoip_country': locationInfo.country,
                 'metadata_geoip_city': locationInfo.city,
+                'metadata_geoip_org': locationInfo.org,
             };
 
             insertData(row).then(results => {
