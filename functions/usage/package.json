@@ -5,7 +5,7 @@
   "description": "Cloudify Usage endpoint",
   "main": "index.js",
   "scripts": {
-    "deploy": "gcloud beta functions deploy cloudifyUsage --entry-point cloudifyUsage --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30"
+    "deploy": "gcloud beta functions deploy cloudifyUsage --project omer-tenant --entry-point cloudifyUsage --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30"
   },
   "repository": {
     "type": "git",

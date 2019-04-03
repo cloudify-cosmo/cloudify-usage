@@ -85,11 +85,11 @@ function getGeoLocationInfo(org, userIP) {
 
 function getGeoIpInfo(geoIpInfo) {
     console.log("GEOIP: " + JSON.stringify(geoIpInfo));
-    var country = geoIpInfo['country']['names']['en'];
-    var city = geoIpInfo['city']['names']['en'];
-    var continent = geoIpInfo['continent']['names']['en']
-    var subdivision = geoIpInfo['subdivisions'][0]['names']['en']
-    var timezone = geoIpInfo['location']['time_zone']
+    var country = 'country' in geoIpInfo ? geoIpInfo['country']['names']['en'] : '';
+    var city = 'city' in geoIpInfo ? geoIpInfo['city']['names']['en'] : '';
+    var continent = 'city' in geoIpInfo ? geoIpInfo['continent']['names']['en'] : '';
+    var subdivision = 'subdivisions' in geoIpInfo ? geoIpInfo['subdivisions'][0]['names']['en'] : '';
+    var timezone = 'location' in geoIpInfo ? geoIpInfo['location']['time_zone'] : '';
     if (subdivision != city) {
         var location = `${city}, ${subdivision}, ${country}`
     } else {
@@ -183,6 +183,7 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
             'metadata_version': _getValue(row_data, 'metadata_version'),
             'metadata_premium_edition': _getValue(row_data, 'metadata_premium_edition'),
             'cloudify_config_ldap_enabled': _getValue(row_data, 'cloudify_config_ldap_enabled'),
+            'metadata_customer_id': _getValue(row_data, 'metadata_customer_id'),
             'metadata_manager_public_ip': user_ip,
             'metadata_geoip_info': locationInfo.location,
             'metadata_geoip_country': locationInfo.country,
