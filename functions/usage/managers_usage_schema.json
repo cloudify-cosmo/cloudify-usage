@@ -5,6 +5,7 @@
   {"name": "metadata_manager_public_ip", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "metadata_geoip_info", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "metadata_timestamp", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "metadata_customer_id", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "system_cpu_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "system_redhat_os", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "system_mem_size_gb", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
