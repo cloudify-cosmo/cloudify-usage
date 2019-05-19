@@ -249,7 +249,9 @@ exports.cloudifyUptime = function cloudifyUptime (req, res) {
             var timestamp_sec = Math.round(new Date().getTime() / 1000);
             var row = {
                 'manager_id': data['metadata']['manager_id'],
+                'customer_id': data['metadata']['customer_id'],
                 'version': data['metadata']['version'],
+                'image_info': data['metadata']['image_info'],
                 'premium_edition': data['metadata']['premium_edition'],
                 'manager_public_ip': user_ip,
                 'geoip_info': locationInfo.location,

@@ -177,6 +177,8 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
             'cloudify_usage_deployments_count': _getValue(row_data, 'cloudify_usage_deployments_count'),
             'cloudify_usage_secrets_count': _getValue(row_data, 'cloudify_usage_secrets_count'),
             'cloudify_usage_plugins_count': _getValue(row_data, 'cloudify_usage_plugins_count'),
+            'cloudify_usage_agents_count': _getValue(row_data, 'cloudify_usage_agents_count'),
+            'cloudify_usage_compute_count': _getValue(row_data, 'cloudify_usage_compute_count'),
             'cloudify_usage_openstack_plugin': _getValue(row_data, 'cloudify_usage_openstack_plugin'),
             'cloudify_usage_blueprints_count': _getValue(row_data, 'cloudify_usage_blueprints_count'),
             'cloudify_config_ha_enabled': _getValue(row_data, 'cloudify_config_ha_enabled'),

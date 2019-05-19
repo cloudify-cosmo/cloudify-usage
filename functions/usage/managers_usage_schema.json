@@ -21,6 +21,8 @@
   {"name": "cloudify_usage_deployments_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_secrets_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_plugins_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_agents_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_compute_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_openstack_plugin", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_blueprints_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_config_ha_enabled", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
