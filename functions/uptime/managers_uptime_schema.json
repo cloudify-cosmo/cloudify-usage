@@ -1,6 +1,8 @@
 [
   {"name": "manager_id", "type": "STRING", "mode": "NULLABLE", "description": ""},
+  {"name": "customer_id", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "version", "type": "STRING", "mode": "NULLABLE", "description": ""},
+  {"name": "image_info", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "premium_edition", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "manager_public_ip", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "geoip_info", "type": "STRING", "mode": "NULLABLE", "description": ""},
