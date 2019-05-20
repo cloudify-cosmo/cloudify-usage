@@ -37,12 +37,10 @@ function insertData(row) {
     });
 }
 
-function _getValue(data, key) {
-    let value = key in data ? data[key] : '';
-    // empty value
-    if (value === '') {
-        return "";
-    }
+function _getValue(data, key, default_value="") {
+    if (!(key in data)) return default_value;
+    value = data[key];
+    
     // boolean value
     let isBoolean = ["true", "false", true, false].indexOf(value) >= 0;
     if (isBoolean) {
@@ -177,11 +175,11 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
             'cloudify_usage_deployments_count': _getValue(row_data, 'cloudify_usage_deployments_count'),
             'cloudify_usage_secrets_count': _getValue(row_data, 'cloudify_usage_secrets_count'),
             'cloudify_usage_plugins_count': _getValue(row_data, 'cloudify_usage_plugins_count'),
-            'cloudify_usage_agents_count': _getValue(row_data, 'cloudify_usage_agents_count'),
-            'cloudify_usage_compute_count': _getValue(row_data, 'cloudify_usage_compute_count'),
+            'cloudify_usage_agents_count': _getValue(row_data, 'cloudify_usage_agents_count', default_value=null),
+            'cloudify_usage_compute_count': _getValue(row_data, 'cloudify_usage_compute_count', default_value=null),
             'cloudify_usage_openstack_plugin': _getValue(row_data, 'cloudify_usage_openstack_plugin'),
             'cloudify_usage_blueprints_count': _getValue(row_data, 'cloudify_usage_blueprints_count'),
-            'cloudify_config_ha_enabled': _getValue(row_data, 'cloudify_config_ha_enabled'),
+            'cloudify_config_ha_enabled': _getValue(row_data, 'cloudify_config_ha_enabled', default_value=null),
             'metadata_version': _getValue(row_data, 'metadata_version'),
             'metadata_premium_edition': _getValue(row_data, 'metadata_premium_edition'),
             'cloudify_config_ldap_enabled': _getValue(row_data, 'cloudify_config_ldap_enabled'),
