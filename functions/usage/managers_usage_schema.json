@@ -7,6 +7,7 @@
   {"name": "metadata_timestamp", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "metadata_customer_id", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "system_cpu_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "system_cpu_model", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "system_redhat_os", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "system_mem_size_gb", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "system_centos_os", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},

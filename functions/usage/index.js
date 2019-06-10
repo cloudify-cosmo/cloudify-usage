@@ -160,6 +160,7 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
         var row = {
             'metadata_manager_id': _getValue(row_data, 'metadata_manager_id'),
             'system_cpu_count': _getValue(row_data, 'system_cpu_count'),
+            'system_cpu_model': _getValue(row_data, 'system_cpu_model'),
             'system_redhat_os': _getValue(row_data, 'system_redhat_os'),
             'system_mem_size_gb': _getValue(row_data, 'system_mem_size_gb'),
             'system_centos_os': _getValue(row_data, 'system_centos_os'),
