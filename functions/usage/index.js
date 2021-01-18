@@ -40,6 +40,11 @@ function insertData(row) {
 function _getValue(data, key, default_value="") {
     if (!(key in data)) return default_value;
     value = data[key];
+
+    // object (dict or list) value
+    if (value !== undefined && value !== null && typeof value == "object") {
+        return JSON.stringify(value)
+    }
     
     // boolean value
     let isBoolean = ["true", "false", true, false].indexOf(value) >= 0;
@@ -167,20 +172,20 @@ exports.cloudifyUsage = function cloudifyUsage (req, res) {
             'cloudify_image_info': _getValue(row_data, 'metadata_image_info'),
             'cloudify_usage_tenants_count': _getValue(row_data, 'cloudify_usage_tenants_count'),
             'cloudify_usage_users_count': _getValue(row_data, 'cloudify_usage_users_count'),
-            'cloudify_usage_users_by_role': JSON.stringify(_getValue(row_data, 'cloudify_usage_users_by_role')),
+            'cloudify_usage_users_by_role': _getValue(row_data, 'cloudify_usage_users_by_role', default_value=null),
             'cloudify_usage_azure_plugin': _getValue(row_data, 'cloudify_usage_azure_plugin'),
             'cloudify_usage_aws_plugin': _getValue(row_data, 'cloudify_usage_aws_plugin'),
             'cloudify_usage_gcp_plugin': _getValue(row_data, 'cloudify_usage_gcp_plugin'),
             'cloudify_usage_executions_count': _getValue(row_data, 'cloudify_usage_executions_count'),
-            'cloudify_usage_executions_succeeded': _getValue(row_data, 'cloudify_usage_executions_succeeded'),
-            'cloudify_usage_executions_failed': _getValue(row_data, 'cloudify_usage_executions_failed'),
-            'cloudify_usage_executions_by_type': JSON.stringify(_getValue(row_data, 'cloudify_usage_executions_by_type')),
+            'cloudify_usage_executions_succeeded': _getValue(row_data, 'cloudify_usage_executions_succeeded', default_value=null),
+            'cloudify_usage_executions_failed': _getValue(row_data, 'cloudify_usage_executions_failed', default_value=null),
+            'cloudify_usage_executions_by_type': _getValue(row_data, 'cloudify_usage_executions_by_type', default_value=null),
             'cloudify_usage_nodes_count': _getValue(row_data, 'cloudify_usage_nodes_count'),
-            'cloudify_usage_nodes_by_type': JSON.stringify(_getValue(row_data, 'cloudify_usage_nodes_by_type')),
+            'cloudify_usage_nodes_by_type': _getValue(row_data, 'cloudify_usage_nodes_by_type', default_value=null),
             'cloudify_usage_node_instances_count': _getValue(row_data, 'cloudify_usage_node_instances_count'),
             'cloudify_usage_deployments_count': _getValue(row_data, 'cloudify_usage_deployments_count'),
             'cloudify_usage_secrets_count': _getValue(row_data, 'cloudify_usage_secrets_count'),
-            'cloudify_usage_sites_count': _getValue(row_data, 'cloudify_usage_sites_count'),
+            'cloudify_usage_sites_count': _getValue(row_data, 'cloudify_usage_sites_count', default_value=null),
             'cloudify_usage_plugins_count': _getValue(row_data, 'cloudify_usage_plugins_count'),
             'cloudify_usage_agents_count': _getValue(row_data, 'cloudify_usage_agents_count', default_value=null),
             'cloudify_usage_compute_count': _getValue(row_data, 'cloudify_usage_compute_count', default_value=null),
