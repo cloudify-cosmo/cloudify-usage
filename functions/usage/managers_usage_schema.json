@@ -32,6 +32,8 @@
   {"name": "cloudify_usage_compute_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_openstack_plugin", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_blueprints_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_first_login", "type": "DATETIME", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_last_login", "type": "DATETIME", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_config_ha_enabled", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_config_ldap_enabled", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""}
 ]
