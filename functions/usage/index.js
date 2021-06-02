@@ -93,34 +93,6 @@ function getGeoLocationInfo(org, userIP) {
 }
 exports.getGeoLocationInfo = getGeoLocationInfo;
 
-function getGeoIpInfo(geoIpInfo) {
-    console.log('GEOIP: ' + JSON.stringify(geoIpInfo));
-    var country =
-        'country' in geoIpInfo ? geoIpInfo['country']['names']['en'] : '';
-    var city = 'city' in geoIpInfo ? geoIpInfo['city']['names']['en'] : '';
-    var continent =
-        'city' in geoIpInfo ? geoIpInfo['continent']['names']['en'] : '';
-    var subdivision =
-        'subdivisions' in geoIpInfo
-            ? geoIpInfo['subdivisions'][0]['names']['en']
-            : '';
-    var timezone =
-        'location' in geoIpInfo ? geoIpInfo['location']['time_zone'] : '';
-    if (subdivision != city) {
-        var location = `${city}, ${subdivision}, ${country}`;
-    } else {
-        var location = `${city}, ${country}`;
-    }
-    return {
-        country: country,
-        city: city,
-        location: location,
-        subdivision: subdivision,
-        continent: continent,
-        timezone: timezone,
-    };
-}
-
 function ipToOrg(ip_addr) {
     return new Promise(function (resolve, reject) {
         try {
