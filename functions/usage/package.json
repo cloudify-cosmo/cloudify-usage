@@ -5,7 +5,8 @@
   "description": "Cloudify Usage endpoint",
   "main": "index.js",
   "scripts": {
-    "deploy": "gcloud beta functions deploy cloudifyUsage --project omer-tenant --entry-point cloudifyUsage --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30"
+    "deploy": "gcloud beta functions deploy cloudifyUsage --project omer-tenant --entry-point cloudifyUsage --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,9 @@
     "request": "^2.83.0"
   },
   "homepage": "https://github.com/cloudify-cosmo/cloudify-usage#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/jest": "^24.9.1",
+    "jest": "^24.9.0"
+  },
   "author": "Cloudify"
 }
