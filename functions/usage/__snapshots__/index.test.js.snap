@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getGeoLocationInfo should resolve IP information for 3.45.34.252 1`] = `
+Object {
+  "city": "Seattle",
+  "continent": "North America",
+  "country": "United States",
+  "location": "Seattle, Washington, United States",
+  "org": "example-org",
+  "subdivision": "Washington",
+  "timezone": "America/Los_Angeles",
+}
+`;
+
+exports[`getGeoLocationInfo should resolve IP information for 90.251.171.80 1`] = `
+Object {
+  "city": "",
+  "continent": "",
+  "country": "United Kingdom",
+  "location": ", United Kingdom",
+  "org": "example-org",
+  "subdivision": "",
+  "timezone": "Europe/London",
+}
+`;
+
+exports[`getGeoLocationInfo should resolve IP information for 157.69.217.108 1`] = `
+Object {
+  "city": "",
+  "continent": "",
+  "country": "Japan",
+  "location": ", Japan",
+  "org": "example-org",
+  "subdivision": "",
+  "timezone": "Asia/Tokyo",
+}
+`;
+
+exports[`getGeoLocationInfo should resolve IP information for 212.82.41.93 1`] = `
+Object {
+  "city": "",
+  "continent": "",
+  "country": "Germany",
+  "location": ", Germany",
+  "org": "example-org",
+  "subdivision": "",
+  "timezone": undefined,
+}
+`;
+
+exports[`getGeoLocationInfo should resolve IP information for 212.180.218.141 1`] = `
+Object {
+  "city": "Warsaw",
+  "continent": "Europe",
+  "country": "Poland",
+  "location": "Warsaw, Mazovia, Poland",
+  "org": "example-org",
+  "subdivision": "Mazovia",
+  "timezone": "Europe/Warsaw",
+}
+`;
