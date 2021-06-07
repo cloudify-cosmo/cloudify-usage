@@ -19,7 +19,7 @@ describe('getGeoLocationInfo', () => {
     });
 
     it('should report an unknown problem for some problematic IP', () => {
-        return expect(() =>
+        return expect(
             getGeoLocationInfo('example', '248.47.119.137')
         ).rejects.toThrowError();
     });
