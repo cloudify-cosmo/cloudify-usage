@@ -14,9 +14,9 @@ Object {
 exports[`getGeoLocationInfo should resolve IP information for 90.251.171.80 1`] = `
 Object {
   "city": "",
-  "continent": "",
+  "continent": "Europe",
   "country": "United Kingdom",
-  "location": ", United Kingdom",
+  "location": "United Kingdom",
   "subdivision": "",
   "timezone": "Europe/London",
 }
@@ -25,9 +25,9 @@ Object {
 exports[`getGeoLocationInfo should resolve IP information for 157.69.217.108 1`] = `
 Object {
   "city": "",
-  "continent": "",
+  "continent": "Asia",
   "country": "Japan",
-  "location": ", Japan",
+  "location": "Japan",
   "subdivision": "",
   "timezone": "Asia/Tokyo",
 }
@@ -36,9 +36,9 @@ Object {
 exports[`getGeoLocationInfo should resolve IP information for 212.82.41.93 1`] = `
 Object {
   "city": "",
-  "continent": "",
+  "continent": "Europe",
   "country": "Germany",
-  "location": ", Germany",
+  "location": "Germany",
   "subdivision": "",
   "timezone": undefined,
 }
