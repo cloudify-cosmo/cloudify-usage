@@ -12,19 +12,17 @@ describe('getGeoLocationInfo', () => {
 
     ipsToResolveCorrectly.forEach((ip) => {
         it(`should resolve IP information for ${ip}`, async () => {
-            expect(
-                await getGeoLocationInfo('example-org', ip)
-            ).toMatchSnapshot();
+            expect(await getGeoLocationInfo(ip)).toMatchSnapshot();
         });
     });
 
     it('should report an unknown problem for some problematic IP', () => {
         return expect(
-            getGeoLocationInfo('example', '248.47.119.137')
+            getGeoLocationInfo('248.47.119.137')
         ).rejects.toThrowError();
     });
 
     it('should report an empty result when the IP cannot be matched', async () => {
-        expect(await getGeoLocationInfo('example', '248.')).toStrictEqual({});
+        expect(await getGeoLocationInfo('248.')).toStrictEqual({});
     });
 });

@@ -1,7 +1,7 @@
 const request = require('request');
 const BigQuery = require('@google-cloud/bigquery');
 const bigQuery = BigQuery({ projectId: 'omer-tenant' });
-const geoip2 = require('geoip2');
+const geoip2 = require('@maxmind/geoip2-node');
 
 const cloudifyIPs = ['31.168.96.38', '54.77.157.208'];
 
@@ -124,57 +124,39 @@ function deleteData() {
     });
 }
 
+/**
+ * @param {string} userIP
+ */
 function getGeoLocationInfo(userIP) {
-    return new Promise(function (resolve, reject) {
-        try {
-            geoip2.init('geo/GeoLite2-City.mmdb');
-            geoip2.lookup(userIP, function (error, result) {
-                if (error) {
-                    console.log('GEOIP Error: %s', error);
-                    resolve({});
-                } else if (result) {
-                    console.log('GEOIP result: ' + JSON.stringify(result));
-                    result = getGeoIpInfo(result);
-                    console.log('GEOIP slim result: ' + JSON.stringify(result));
-                    resolve(result);
-                } else {
-                    reject(Error('say what??'));
-                }
-            });
-        } catch (err) {
-            console.log(`failed to retrieve geo ip info: ${err.message}`);
-            resolve({});
-        }
-    });
-}
+    return geoip2.Reader.open('geo/GeoLite2-City.mmdb')
+        .then((reader) => {
+            const geoipResult = reader.city(userIP);
+            const subdivision = geoipResult.subdivisions?.[0].names.en ?? '';
+            const country = geoipResult.country?.names.en ?? '';
+            const city = geoipResult.city?.names.en ?? '';
 
-function getGeoIpInfo(geoIpInfo) {
-    console.log('GEOIP: ' + JSON.stringify(geoIpInfo));
-    var country =
-        'country' in geoIpInfo ? geoIpInfo['country']['names']['en'] : '';
-    var city = 'city' in geoIpInfo ? geoIpInfo['city']['names']['en'] : '';
-    var continent =
-        'city' in geoIpInfo ? geoIpInfo['continent']['names']['en'] : '';
-    var subdivision =
-        'subdivisions' in geoIpInfo
-            ? geoIpInfo['subdivisions'][0]['names']['en']
-            : '';
-    var timezone =
-        'location' in geoIpInfo ? geoIpInfo['location']['time_zone'] : '';
-    if (subdivision != city) {
-        var location = `${city}, ${subdivision}, ${country}`;
-    } else {
-        var location = `${city}, ${country}`;
-    }
-    return {
-        country: country,
-        city: city,
-        location: location,
-        subdivision: subdivision,
-        continent: continent,
-        timezone: timezone,
-    };
+            return {
+                city,
+                continent: geoipResult.continent?.names.en ?? '',
+                country,
+                location: [city, subdivision, country]
+                    .filter((s) => s.length > 0)
+                    .join(', '),
+                subdivision,
+                timezone: geoipResult.location?.timeZone,
+            };
+        })
+        .catch((error) => {
+            console.log('GEOIP Error: %s', error);
+
+            if (error?.name === 'AddressNotFoundError') {
+                return Promise.reject(error);
+            }
+
+            return {};
+        });
 }
+exports.getGeoLocationInfo = getGeoLocationInfo;
 
 function ipToOrg(ip_addr) {
     return new Promise(function (resolve, reject) {

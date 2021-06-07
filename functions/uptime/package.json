@@ -5,7 +5,9 @@
   "description": "Cloudify Uptime endpoint",
   "main": "index.js",
   "scripts": {
-    "deploy": "gcloud beta functions deploy cloudifyUptime --entry-point cloudifyUptime --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30"
+    "deploy": "gcloud beta functions deploy cloudifyUptime --entry-point cloudifyUptime --trigger-http --stage-bucket cloudify-functions --memory 128MB --timeout 30",
+    "predeploy": "npm run test",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -13,12 +15,18 @@
   },
   "dependencies": {
     "@google-cloud/bigquery": "^1.0.0",
-    "geoip2": "^1.0.5",
+    "@maxmind/geoip2-node": "^3.0.0",
     "http-status-codes": "^1.3.0",
     "node-ipv4": "^1.1.2",
     "request": "^2.83.0"
   },
   "homepage": "https://github.com/cloudify-cosmo/cloudify-usage#readme",
-  "devDependencies": {},
-  "author": "Cloudify"
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "jest": "^27.0.4"
+  },
+  "author": "Cloudify",
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }
