@@ -52,3 +52,4 @@ riemann.log
 *.swp
 
 *.rendered.spec
+node_modules
