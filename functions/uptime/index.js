@@ -147,6 +147,7 @@ function getGeoLocationInfo(userIP) {
         }
     });
 }
+exports.getGeoLocationInfo = getGeoLocationInfo;
 
 function getGeoIpInfo(geoIpInfo) {
     console.log('GEOIP: ' + JSON.stringify(geoIpInfo));
