@@ -221,6 +221,11 @@ exports.cloudifyUsage = function cloudifyUsage(req, res) {
                     row_data,
                     'cloudify_usage_deployments_count'
                 ),
+                cloudify_usage_environments_count: _getValue(
+                    row_data,
+                    'cloudify_usage_environments_count',
+                    (default_value = null)
+                ),
                 cloudify_usage_secrets_count: _getValue(
                     row_data,
                     'cloudify_usage_secrets_count'
