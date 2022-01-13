@@ -25,6 +25,7 @@
   {"name": "cloudify_usage_nodes_by_type", "type": "STRING", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_node_instances_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_deployments_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_environments_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_secrets_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_sites_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_plugins_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
