@@ -267,6 +267,51 @@ exports.cloudifyUsage = function cloudifyUsage(req, res) {
                     'cloudify_usage_last_login',
                     (default_value = null)
                 ),
+                cloudify_usage_max_deployments: _getValue(
+                    row_data,
+                    'cloudify_usage_max_deployments',
+                    (default_value = null)
+                ),
+                cloudify_usage_max_blueprints: _getValue(
+                    row_data,
+                    'cloudify_usage_max_blueprints',
+                    (default_value = null)
+                ),
+                cloudify_usage_max_users: _getValue(
+                    row_data,
+                    'cloudify_usage_max_users',
+                    (default_value = null)
+                ),
+                cloudify_usage_max_tenants: _getValue(
+                    row_data,
+                    'cloudify_usage_max_tenants',
+                    (default_value = null)
+                ),
+                cloudify_usage_total_deployments: _getValue(
+                    row_data,
+                    'cloudify_usage_total_deployments',
+                    (default_value = null)
+                ),
+                cloudify_usage_total_blueprints: _getValue(
+                    row_data,
+                    'cloudify_usage_total_blueprints',
+                    (default_value = null)
+                ),
+                cloudify_usage_total_executions: _getValue(
+                    row_data,
+                    'cloudify_usage_total_executions',
+                    (default_value = null)
+                ),
+                cloudify_usage_total_logins: _getValue(
+                    row_data,
+                    'cloudify_usage_total_logins',
+                    (default_value = null)
+                ),
+                cloudify_usage_total_logged_in_users: _getValue(
+                    row_data,
+                    'cloudify_usage_total_logged_in_users',
+                    (default_value = null)
+                ),
                 cloudify_config_ha_enabled: _getValue(
                     row_data,
                     'cloudify_config_ha_enabled',
