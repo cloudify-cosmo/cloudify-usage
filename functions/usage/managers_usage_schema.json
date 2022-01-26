@@ -35,6 +35,15 @@
   {"name": "cloudify_usage_blueprints_count", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_first_login", "type": "DATETIME", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_usage_last_login", "type": "DATETIME", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_max_deployments", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_max_blueprints", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_max_users", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_max_tenants", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_total_deployments", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_total_blueprints", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_total_executions", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_total_logins", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
+  {"name": "cloudify_usage_total_logged_in_users", "type": "INTEGER", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_config_ha_enabled", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""},
   {"name": "cloudify_config_ldap_enabled", "type": "BOOLEAN", "mode": "NULLABLE", "description": ""}
 ]
